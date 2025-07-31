@@ -40,7 +40,6 @@
             margin-top: 6px;
         }
         
-        /* Flowchart container */
         .flowchart-container {
             position: relative;
             width: 100%;
@@ -51,7 +50,6 @@
             border-radius: 10px;
         }
         
-        /* Component positioning */
         .sensor-1 { position: absolute; top: 20px; left: 20px; width: 180px; }
         .sensor-2 { position: absolute; top: 150px; left: 20px; width: 180px; }
         .sensor-3 { position: absolute; top: 280px; left: 20px; width: 180px; }
@@ -62,12 +60,10 @@
         .cloud { position: absolute; top: 400px; left: 530px; width: 200px; min-height: 90px; text-align: center; display: flex; align-items: center; justify-content: center; font-size: 1.2em; font-weight: bold; }
         .ui { position: absolute; top: 250px; right: 60px; width: 200px; min-height: 90px; text-align: center; display: flex; align-items: center; justify-content: center; font-size: 1.2em; font-weight: bold; }
         
-        /* Arrows */
         .arrow { position: absolute; background: #333; }
         .arrow-h { height: 2px; }
         .arrow-v { width: 2px; }
         
-        /* Arrow heads */
         .arrow-head-right {
             position: absolute;
             right: -8px;
@@ -89,7 +85,6 @@
             border-right: 4px solid transparent;
         }
         
-        /* Arrow labels */
         .arrow-label {
             position: absolute;
             font-size: 10px;
@@ -100,7 +95,6 @@
             white-space: nowrap;
         }
 
-        /* Remove padding in tables inside logs */
         .log-col .table {
             margin-bottom: 0;
         }
@@ -114,7 +108,6 @@
     
     <!-- Flowchart -->
     <div class="flowchart-container">
-        <!-- Sensors -->
         {% for sensor in sensor_states %}
         <div class="flowchart-box sensor-{{ forloop.counter }} {% if sensor.on %}sensor-on{% else %}sensor-off{% endif %}" style="height: 110px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
             <div style="font-size: 1.1em; font-weight: 500; text-align: center; width: 100%;">{{ sensor.label }}</div>
@@ -123,7 +116,6 @@
             </button>
             <div class="sensor-value" style="width: 100%; text-align: center;">{{ sensor.value|default:'--' }}</div>
         </div>
-        <!-- Horizontal arrow from sensor to processor -->
         {% if forloop.counter == 1 %}
         <div class="arrow arrow-h" style="top: 75px; left: 210px; width: 300px;">
             <div class="arrow-head-right"></div>
@@ -151,50 +143,37 @@
         </div>
         {% endif %}
         {% endfor %}
-
-        <!-- Processor -->
         <div class="flowchart-box processor" style="top: 180px; left: 530px;">
             <div><strong>Some processors</strong></div>
         </div>
-
-        <!-- Processor to Cloud -->
         <div class="arrow arrow-v" style="top: 270px; left: 630px; height: 130px;">
             <div class="arrow-head-down"></div>
             <div class="arrow-label" style="left: 10px; top: 50px;">Send to Cloud</div>
         </div>
-        <!-- Processor to UI -->
         <div class="arrow arrow-h" style="top: 225px; left: 730px; width: 350px;">
             <div class="arrow-head-right"></div>
             <div class="arrow-label" style="left: 120px; top: -18px;">Send to UI</div>
         </div>
-        <!-- Cloud -->
         <div class="flowchart-box cloud" style="top: 400px; left: 530px;">
             <div><strong>Cloud</strong></div>
         </div>
-
-        <!-- Cloud to UI -->
         <div class="arrow arrow-h" style="top: 445px; left: 730px; width: 350px;">
             <div class="arrow-head-right"></div>
             <div class="arrow-label" style="left: 120px; top: -18px;">Send to UI</div>
         </div>
-
-        <!-- UI -->
         <div class="flowchart-box ui" style="top: 250px; right: 60px;">
             <div><strong>UI Interface</strong></div>
         </div>
-
-        <!-- UI to Processor (Request Data) -->
         <div class="arrow arrow-h" style="top: 275px; right: 260px; width: 200px; transform: scaleX(-1);">
             <div class="arrow-head-right"></div>
             <div class="arrow-label" style="right: 80px; top: -18px;">Request Data</div>
         </div>
-        <!-- UI to Cloud (Request Data) -->
         <div class="arrow arrow-h" style="top: 495px; right: 260px; width: 200px; transform: scaleX(-1);">
             <div class="arrow-head-right"></div>
             <div class="arrow-label" style="right: 80px; top: -18px;">Request Data</div>
         </div>
     </div>
-    
+
     <!-- Logs as tables -->
     <div class="row">
         <div class="col-md-4">
@@ -281,14 +260,14 @@
             </div>
         </div>
     </div>
+
+    <!-- jQuery and AJAX scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         // Toggle sensor ON/OFF
         $(document).on('click', '.sensor-toggle', function() {
             var btn = $(this);
             var sensor = btn.data('sensor');
-
-            // Disable button while processing
             btn.prop('disabled', true);
 
             $.post("/toggle_sensor/", {sensor: sensor})
@@ -303,13 +282,17 @@
             });
         });
 
-        // Poll logs every 3 seconds and update the tables
+        // Poll logs every 3 seconds and update the tables with newest on top
         function pollLogs() {
             ["sensor", "cloud", "ui"].forEach(function(type) {
                 $.get(`/fetch_logs/${type}/`, function(resp) {
                     var tbodyId = `#${type}-logs-body`;
                     var rows = "";
-                    resp.logs.forEach(function(l) {
+
+                    // API returns newest first, so use as is (no reverse)
+                    var logs = resp.logs;
+
+                    logs.forEach(function(l) {
                         if(type === 'ui') {
                             rows += `<tr>
                                         <td>${l.timestamp}</td>
@@ -326,17 +309,17 @@
                                      </tr>`;
                         }
                     });
+
                     if(!rows) {
                         if(type === 'ui')
                             rows = `<tr><td colspan="3" class="text-center">No ${type.charAt(0).toUpperCase() + type.slice(1)} Logs</td></tr>`;
                         else
                             rows = `<tr><td colspan="5" class="text-center">No ${type.charAt(0).toUpperCase() + type.slice(1)} Logs</td></tr>`;
                     }
+
                     $(tbodyId).html(rows);
-                    // Auto-scroll to bottom (latest logs)
-                    $(`#${type}-logs-body`).closest('.log-col').scrollTop(
-                        $(`#${type}-logs-body`).closest('.log-col')[0].scrollHeight
-                    );
+                    // Scroll to top because newest logs on top
+                    $(`${tbodyId}`).closest('.log-col').scrollTop(0);
                 });
             });
         }
