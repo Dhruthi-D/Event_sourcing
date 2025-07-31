@@ -2,328 +2,266 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Home Automation Logs</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <style>
-        .log-col {
-            height: 400px;
-            overflow-y: scroll;
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 10px;
-        }
-        .sensor-toggle {
-            margin-bottom: 10px;
-        }
-        .flowchart-box {
-            border: 2px solid #333;
-            border-radius: 10px;
-            padding: 10px;
-            background: #e9ecef;
-            min-height: 80px;
-            min-width: 150px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-        .sensor-on {
-            background: #d4edda;
-        }
-        .sensor-off {
-            background: #f8d7da;
-        }
-        .sensor-value {
-            font-weight: bold;
-            margin-top: 6px;
-        }
-        
-        .flowchart-container {
-            position: relative;
-            width: 100%;
-            height: 700px;
-            margin-bottom: 30px;
-            background: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-        }
-        
-        .sensor-1 { position: absolute; top: 20px; left: 20px; width: 180px; }
-        .sensor-2 { position: absolute; top: 150px; left: 20px; width: 180px; }
-        .sensor-3 { position: absolute; top: 280px; left: 20px; width: 180px; }
-        .sensor-4 { position: absolute; top: 410px; left: 20px; width: 180px; }
-        .sensor-5 { position: absolute; top: 540px; left: 20px; width: 180px; }
-        
-        .processor { position: absolute; top: 180px; left: 530px; width: 200px; min-height: 90px; text-align: center; display: flex; align-items: center; justify-content: center; font-size: 1.2em; font-weight: bold; }
-        .cloud { position: absolute; top: 400px; left: 530px; width: 200px; min-height: 90px; text-align: center; display: flex; align-items: center; justify-content: center; font-size: 1.2em; font-weight: bold; }
-        .ui { position: absolute; top: 250px; right: 60px; width: 200px; min-height: 90px; text-align: center; display: flex; align-items: center; justify-content: center; font-size: 1.2em; font-weight: bold; }
-        
-        .arrow { position: absolute; background: #333; }
-        .arrow-h { height: 2px; }
-        .arrow-v { width: 2px; }
-        
-        .arrow-head-right {
-            position: absolute;
-            right: -8px;
-            top: -3px;
-            width: 0;
-            height: 0;
-            border-left: 8px solid #333;
-            border-top: 4px solid transparent;
-            border-bottom: 4px solid transparent;
-        }
-        .arrow-head-down {
-            position: absolute;
-            bottom: -8px;
-            left: -3px;
-            width: 0;
-            height: 0;
-            border-top: 8px solid #333;
-            border-left: 4px solid transparent;
-            border-right: 4px solid transparent;
-        }
-        
-        .arrow-label {
-            position: absolute;
-            font-size: 10px;
-            color: #666;
-            background: white;
-            padding: 2px 4px;
-            border-radius: 3px;
-            white-space: nowrap;
-        }
+  <meta charset="UTF-8" />
+  <title>Home Automation Logs</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+  <style>
+    body { font-family: Arial, sans-serif; }
+    .log-col {
+      height: 400px;
+      overflow-y: scroll;
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 10px;
+    }
+    .sensor-toggle { margin-bottom: 10px; }
+    .flowchart-box {
+      border: 2px solid #333;
+      border-radius: 10px;
+      padding: 10px;
+      background: #e9ecef;
+      min-width: 150px;
+      min-height: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      font-weight: 600;
+      font-size: 1em;
+      text-align: center;
+      position: absolute;
+    }
+    .sensor-on { background: #d4edda !important; }
+    .sensor-off { background: #f8d7da !important; }
+    .sensor-value { font-weight: bold; margin-top: 6px; }
+    .flowchart-container {
+      position: relative;
+      width: 1200px;
+      height: 720px;
+      margin: 0 auto 30px auto;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      overflow: visible;
+    }
+    /* Sensor box positions */
+    .sensor-1 { left: 60px;  top: 80px; width: 180px; height: 85px; }
+    .sensor-2 { left: 60px;  top: 190px; width: 180px; height: 85px; }
+    .sensor-3 { left: 60px;  top: 300px; width: 180px; height: 85px; }
+    .sensor-4 { left: 60px;  top: 410px; width: 180px; height: 85px; }
+    .sensor-5 { left: 60px;  top: 520px; width: 180px; height: 85px; }
 
-        .log-col .table {
-            margin-bottom: 0;
-        }
-    </style>
+    /* Main boxes */
+    .processor { left: 420px;  top: 260px; width: 220px; height: 90px; }
+    .cloud     { left: 770px; top: 480px; width: 200px; height: 90px; }
+    .ui        { left: 950px; top: 150px; width: 200px; height: 90px; }
+
+    /* Fix log table margins */
+    .log-col .table { margin-bottom: 0; }
+
+    /* Responsive adjustments */
+    @media (max-width: 1400px) {
+      .flowchart-container { width: 1000px; }
+      .ui { left: 800px; }
+    }
+  </style>
 </head>
 <body class="container py-4">
-    <div class="d-flex justify-content-end mb-2">
-        <a href="/dashboard/" class="btn btn-primary">Go to Dashboard</a>
-    </div>
-    <h2 class="mb-4">Home Automation Logs &amp; Flowchart</h2>
-    
-    <!-- Flowchart -->
-    <div class="flowchart-container">
-        {% for sensor in sensor_states %}
-        <div class="flowchart-box sensor-{{ forloop.counter }} {% if sensor.on %}sensor-on{% else %}sensor-off{% endif %}" style="height: 110px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-            <div style="font-size: 1.1em; font-weight: 500; text-align: center; width: 100%;">{{ sensor.label }}</div>
-            <button class="btn btn-sm {% if sensor.on %}btn-success{% else %}btn-danger{% endif %} sensor-toggle mt-2 mb-1" data-sensor="{{ sensor.key }}" style="width: 80px;">
-                {% if sensor.on %}ON{% else %}OFF{% endif %}
-            </button>
-            <div class="sensor-value" style="width: 100%; text-align: center;">{{ sensor.value|default:'--' }}</div>
-        </div>
-        {% if forloop.counter == 1 %}
-        <div class="arrow arrow-h" style="top: 75px; left: 210px; width: 300px;">
-            <div class="arrow-head-right"></div>
-            <div class="arrow-label" style="left: 120px; top: -18px;">Sensor Data</div>
-        </div>
-        {% elif forloop.counter == 2 %}
-        <div class="arrow arrow-h" style="top: 205px; left: 210px; width: 300px;">
-            <div class="arrow-head-right"></div>
-            <div class="arrow-label" style="left: 120px; top: -18px;">Sensor Data</div>
-        </div>
-        {% elif forloop.counter == 3 %}
-        <div class="arrow arrow-h" style="top: 335px; left: 210px; width: 300px;">
-            <div class="arrow-head-right"></div>
-            <div class="arrow-label" style="left: 120px; top: -18px;">Sensor Data</div>
-        </div>
-        {% elif forloop.counter == 4 %}
-        <div class="arrow arrow-h" style="top: 465px; left: 210px; width: 300px;">
-            <div class="arrow-head-right"></div>
-            <div class="arrow-label" style="left: 120px; top: -18px;">Sensor Data</div>
-        </div>
-        {% elif forloop.counter == 5 %}
-        <div class="arrow arrow-h" style="top: 595px; left: 210px; width: 300px;">
-            <div class="arrow-head-right"></div>
-            <div class="arrow-label" style="left: 120px; top: -18px;">Sensor Data</div>
-        </div>
-        {% endif %}
-        {% endfor %}
-        <div class="flowchart-box processor" style="top: 180px; left: 530px;">
-            <div><strong>Some processors</strong></div>
-        </div>
-        <div class="arrow arrow-v" style="top: 270px; left: 630px; height: 130px;">
-            <div class="arrow-head-down"></div>
-            <div class="arrow-label" style="left: 10px; top: 50px;">Send to Cloud</div>
-        </div>
-        <div class="arrow arrow-h" style="top: 225px; left: 730px; width: 350px;">
-            <div class="arrow-head-right"></div>
-            <div class="arrow-label" style="left: 120px; top: -18px;">Send to UI</div>
-        </div>
-        <div class="flowchart-box cloud" style="top: 400px; left: 530px;">
-            <div><strong>Cloud</strong></div>
-        </div>
-        <div class="arrow arrow-h" style="top: 445px; left: 730px; width: 350px;">
-            <div class="arrow-head-right"></div>
-            <div class="arrow-label" style="left: 120px; top: -18px;">Send to UI</div>
-        </div>
-        <div class="flowchart-box ui" style="top: 250px; right: 60px;">
-            <div><strong>UI Interface</strong></div>
-        </div>
-        <div class="arrow arrow-h" style="top: 275px; right: 260px; width: 200px; transform: scaleX(-1);">
-            <div class="arrow-head-right"></div>
-            <div class="arrow-label" style="right: 80px; top: -18px;">Request Data</div>
-        </div>
-        <div class="arrow arrow-h" style="top: 495px; right: 260px; width: 200px; transform: scaleX(-1);">
-            <div class="arrow-head-right"></div>
-            <div class="arrow-label" style="right: 80px; top: -18px;">Request Data</div>
-        </div>
-    </div>
 
-    <!-- Logs as tables -->
-    <div class="row">
-        <div class="col-md-4">
-            <h5>Sensor Logs</h5>
-            <div class="log-col p-0">
-                <table class="table table-sm table-bordered table-striped m-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Timestamp (IST)</th>
-                            <th>Event</th>
-                            <th>Sensor</th>
-                            <th>Value</th>
-                            <th>Details</th>
-                        </tr>
-                    </thead>
-                    <tbody id="sensor-logs-body">
-                    {% for log in sensor_logs %}
-                        <tr>
-                            <td>{{ log.timestamp_ist }}</td>
-                            <td>{{ log.event_type }}</td>
-                            <td>{{ log.sensor }}</td>
-                            <td>{{ log.value }}</td>
-                            <td>{{ log.details }}</td>
-                        </tr>
-                    {% empty %}
-                        <tr><td colspan="5" class="text-center">No Sensor Logs</td></tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <h5>Cloud Logs</h5>
-            <div class="log-col p-0">
-                <table class="table table-sm table-bordered table-striped m-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Timestamp (IST)</th>
-                            <th>Event</th>
-                            <th>Sensor</th>
-                            <th>Value</th>
-                            <th>Details</th>
-                        </tr>
-                    </thead>
-                    <tbody id="cloud-logs-body">
-                    {% for log in cloud_logs %}
-                        <tr>
-                            <td>{{ log.timestamp_ist }}</td>
-                            <td>{{ log.event_type }}</td>
-                            <td>{{ log.sensor }}</td>
-                            <td>{{ log.value }}</td>
-                            <td>{{ log.details }}</td>
-                        </tr>
-                    {% empty %}
-                        <tr><td colspan="5" class="text-center">No Cloud Logs</td></tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <h5>UI Logs</h5>
-            <div class="log-col p-0">
-                <table class="table table-sm table-bordered table-striped m-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Timestamp (IST)</th>
-                            <th>Event</th>
-                            <th>Details</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ui-logs-body">
-                    {% for log in ui_logs %}
-                        <tr>
-                            <td>{{ log.timestamp_ist }}</td>
-                            <td>{{ log.event_type }}</td>
-                            <td>{{ log.details }}</td>
-                        </tr>
-                    {% empty %}
-                        <tr><td colspan="3" class="text-center">No UI Logs</td></tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+  <!-- Navigation -->
+  <div class="d-flex justify-content-end mb-2">
+    <a href="/dashboard/" class="btn btn-primary">Go to Dashboard</a>
+  </div>
+
+  <h2 class="mb-4 text-center">Home Automation Logs &amp; Flowchart</h2>
+
+  <!-- Flowchart container -->
+  <div class="flowchart-container">
+
+    <!-- Sensor boxes -->
+    {% for sensor in sensor_states %}
+      <div class="flowchart-box sensor-{{ forloop.counter }} {% if sensor.on %}sensor-on{% else %}sensor-off{% endif %}">
+        <div>{{ sensor.label }}</div>
+        <button class="btn btn-sm {% if sensor.on %}btn-success{% else %}btn-danger{% endif %} sensor-toggle mt-2 mb-1"
+                data-sensor="{{ sensor.key }}" style="width: 80px;">
+          {% if sensor.on %}ON{% else %}OFF{% endif %}
+        </button>
+        <div class="sensor-value">{{ sensor.value|default:"--" }}</div>
+      </div>
+    {% endfor %}
+
+    <!-- Main boxes -->
+    <div class="flowchart-box processor">Some processors</div>
+    <div class="flowchart-box cloud">Cloud</div>
+    <div class="flowchart-box ui">UI Interface</div>
+
+    <!-- SVG arrows -->
+    <svg width="1200" height="720" style="position:absolute; top:0; left:0; pointer-events:none;" aria-hidden="true" focusable="false">
+      <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+        </marker>
+        <marker id="arrowhead-blue" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#2196f3"/>
+        </marker>
+      </defs>
+
+      <!-- Sensors to Processor -->
+      <line x1="240" y1="122" x2="420" y2="305" stroke="#333" stroke-width="3" marker-end="url(#arrowhead)" />
+      <line x1="240" y1="232" x2="420" y2="305" stroke="#333" stroke-width="3" marker-end="url(#arrowhead)" />
+      <line x1="240" y1="342" x2="420" y2="305" stroke="#333" stroke-width="3" marker-end="url(#arrowhead)" />
+      <line x1="240" y1="452" x2="420" y2="325" stroke="#333" stroke-width="3" marker-end="url(#arrowhead)" />
+      <line x1="240" y1="562" x2="420" y2="345" stroke="#333" stroke-width="3" marker-end="url(#arrowhead)" />
+
+      <!-- Processor to Cloud -->
+      <line x1="640" y1="340" x2="770" y2="525" stroke="#333" stroke-width="3" marker-end="url(#arrowhead)" />
+      <!-- Processor to UI -->
+      <line x1="640" y1="280" x2="950" y2="210" stroke="#333" stroke-width="3" marker-end="url(#arrowhead)" />
+      <!-- Cloud to UI -->
+      <line x1="970" y1="525" x2="1050" y2="210" stroke="#333" stroke-width="3" marker-end="url(#arrowhead)" />
+
+      <!-- UI to Processor request (dashed blue, parallel to output) -->
+      <line x1="950" y1="250" x2="640" y2="300" stroke="#2196f3" stroke-width="3" marker-end="url(#arrowhead-blue)" stroke-dasharray="12,10"/>
+      <!-- UI to Cloud request (dashed blue) -->
+      <line x1="1050" y1="260" x2="970" y2="545" stroke="#2196f3" stroke-width="3" marker-end="url(#arrowhead-blue)" stroke-dasharray="12,10"/>
+    </svg>
+  </div>
+
+  <!-- Logs tables -->
+  <div class="row">
+    <!-- Sensor Logs -->
+    <div class="col-md-4">
+      <h5>Sensor Logs</h5>
+      <div class="log-col p-0">
+        <table class="table table-sm table-bordered table-striped m-0">
+          <thead class="table-light">
+            <tr>
+              <th>Timestamp (IST)</th>
+              <th>Event</th>
+              <th>Sensor</th>
+              <th>Value</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody id="sensor-logs-body">
+            {% for log in sensor_logs %}
+              <tr>
+                <td>{{ log.timestamp_ist }}</td>
+                <td>{{ log.event_type }}</td>
+                <td>{{ log.sensor }}</td>
+                <td>{{ log.value }}</td>
+                <td>{{ log.details }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="5" class="text-center">No Sensor Logs</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <!-- jQuery and AJAX scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        // Toggle sensor ON/OFF
-        $(document).on('click', '.sensor-toggle', function() {
-            var btn = $(this);
-            var sensor = btn.data('sensor');
-            btn.prop('disabled', true);
+    <!-- Cloud Logs -->
+    <div class="col-md-4">
+      <h5>Cloud Logs</h5>
+      <div class="log-col p-0">
+        <table class="table table-sm table-bordered table-striped m-0">
+          <thead class="table-light">
+            <tr>
+              <th>Timestamp (IST)</th>
+              <th>Event</th>
+              <th>Sensor</th>
+              <th>Value</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody id="cloud-logs-body">
+            {% for log in cloud_logs %}
+              <tr>
+                <td>{{ log.timestamp_ist }}</td>
+                <td>{{ log.event_type }}</td>
+                <td>{{ log.sensor }}</td>
+                <td>{{ log.value }}</td>
+                <td>{{ log.details }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="5" class="text-center">No Cloud Logs</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-            $.post("/toggle_sensor/", {sensor: sensor})
-            .done(function(data) {
-                location.reload(); // Reload to update state and logs
-            })
-            .fail(function() {
-                alert('Failed to toggle sensor');
-            })
-            .always(function() {
-                btn.prop('disabled', false);
-            });
+    <!-- UI Logs -->
+    <div class="col-md-4">
+      <h5>UI Logs</h5>
+      <div class="log-col p-0">
+        <table class="table table-sm table-bordered table-striped m-0">
+          <thead class="table-light">
+            <tr>
+              <th>Timestamp (IST)</th>
+              <th>Event</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody id="ui-logs-body">
+            {% for log in ui_logs %}
+              <tr>
+                <td>{{ log.timestamp_ist }}</td>
+                <td>{{ log.event_type }}</td>
+                <td>{{ log.details }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="3" class="text-center">No UI Logs</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- jQuery and AJAX -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    // Sensor toggle AJAX
+    $(document).on('click', '.sensor-toggle', function() {
+      const btn = $(this);
+      const sensor = btn.data('sensor');
+      btn.prop('disabled', true);
+      $.post("/toggle_sensor/", { sensor: sensor })
+        .done(() => location.reload())
+        .fail(() => alert('Failed to toggle sensor'))
+        .always(() => btn.prop('disabled', false));
+    });
+
+    // Poll logs every 3 seconds
+    function pollLogs() {
+      ["sensor", "cloud", "ui"].forEach(type => {
+        $.get(`/fetch_logs/${type}/`, resp => {
+          const tbodyId = `#${type}-logs-body`;
+          let rows = "";
+          const logs = resp.logs;
+
+          logs.forEach(l => {
+            if(type === "ui") {
+              rows += `<tr><td>${l.timestamp}</td><td>${l.event_type}</td><td>${l.details}</td></tr>`;
+            } else {
+              rows += `<tr><td>${l.timestamp}</td><td>${l.event_type}</td><td>${l.sensor}</td><td>${l.value || ''}</td><td>${l.details || ''}</td></tr>`;
+            }
+          });
+
+          if(!rows) {
+            const colspan = (type === "ui") ? 3 : 5;
+            rows = `<tr><td colspan="${colspan}" class="text-center">No ${type.charAt(0).toUpperCase() + type.slice(1)} Logs</td></tr>`;
+          }
+
+          $(tbodyId).html(rows);
+          $(`${tbodyId}`).closest('.log-col').scrollTop(0);
         });
+      });
+    }
+    setInterval(pollLogs, 3000);
+  </script>
 
-        // Poll logs every 3 seconds and update the tables with newest on top
-        function pollLogs() {
-            ["sensor", "cloud", "ui"].forEach(function(type) {
-                $.get(`/fetch_logs/${type}/`, function(resp) {
-                    var tbodyId = `#${type}-logs-body`;
-                    var rows = "";
-
-                    // API returns newest first, so use as is (no reverse)
-                    var logs = resp.logs;
-
-                    logs.forEach(function(l) {
-                        if(type === 'ui') {
-                            rows += `<tr>
-                                        <td>${l.timestamp}</td>
-                                        <td>${l.event_type}</td>
-                                        <td>${l.details}</td>
-                                     </tr>`;
-                        } else {
-                            rows += `<tr>
-                                        <td>${l.timestamp}</td>
-                                        <td>${l.event_type}</td>
-                                        <td>${l.sensor}</td>
-                                        <td>${l.value || ''}</td>
-                                        <td>${l.details || ''}</td>
-                                     </tr>`;
-                        }
-                    });
-
-                    if(!rows) {
-                        if(type === 'ui')
-                            rows = `<tr><td colspan="3" class="text-center">No ${type.charAt(0).toUpperCase() + type.slice(1)} Logs</td></tr>`;
-                        else
-                            rows = `<tr><td colspan="5" class="text-center">No ${type.charAt(0).toUpperCase() + type.slice(1)} Logs</td></tr>`;
-                    }
-
-                    $(tbodyId).html(rows);
-                    // Scroll to top because newest logs on top
-                    $(`${tbodyId}`).closest('.log-col').scrollTop(0);
-                });
-            });
-        }
-        setInterval(pollLogs, 3000);
-    </script>
 </body>
 </html>
