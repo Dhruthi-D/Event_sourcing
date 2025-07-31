@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home Automation Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .sensor-card { border-radius: 10px; box-shadow: 0 2px 8px #eee; margin-bottom: 20px; }
+        .sensor-on { background: #d4edda; }
+        .sensor-off { background: #f8d7da; }
+        .sensor-label { font-weight: bold; font-size: 1.2em; }
+        .sensor-value { font-size: 1.5em; }
+        .timestamp { font-size: 0.9em; color: #555; }
+        .top-btn { position: absolute; right: 30px; top: 30px; }
+    </style>
+</head>
+<body class="container py-4 position-relative">
+    <a href="/" class="btn btn-secondary top-btn">&larr; Back to Logs</a>
+    <h2 class="mb-4">Home Automation Dashboard</h2>
+    <div class="row">
+        {% for sensor in dashboard %}
+        <div class="col-md-4">
+            {% if sensor.on %}
+                <div class="card sensor-card sensor-on p-3">
+            {% else %}
+                <div class="card sensor-card sensor-off p-3">
+            {% endif %}
+                <div class="sensor-label">{{ sensor.label }}</div>
+                <div>Status: <span class="badge {% if sensor.on %}bg-success{% else %}bg-danger{% endif %}">{% if sensor.on %}ON{% else %}OFF{% endif %}</span></div>
+                <div class="sensor-value mt-2">{{ sensor.value|default:'--' }}</div>
+                <div class="timestamp mt-2">
+                    {% if sensor.on %}
+                        <div>Live from sensor</div>
+                        <div>Updated: {{ sensor.timestamp|date:'Y-m-d H:i:s' }}</div>
+                    {% else %}
+                        <div>From Cloud</div>
+                        <div>Cloud timestamp: {{ sensor.timestamp|date:'Y-m-d H:i:s' }}</div>
+                        <div>UI shown at: {{ now|date:'Y-m-d H:i:s' }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html> 
