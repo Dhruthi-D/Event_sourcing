@@ -6,8 +6,16 @@
     <title>Home Automation Logs</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
-        .log-col { height: 400px; overflow-y: scroll; background: #f8f9fa; border-radius: 8px; padding: 10px; }
-        .sensor-toggle { margin-bottom: 10px; }
+        .log-col {
+            height: 400px;
+            overflow-y: scroll;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .sensor-toggle {
+            margin-bottom: 10px;
+        }
         .flowchart-box {
             border: 2px solid #333;
             border-radius: 10px;
@@ -91,13 +99,18 @@
             border-radius: 3px;
             white-space: nowrap;
         }
+
+        /* Remove padding in tables inside logs */
+        .log-col .table {
+            margin-bottom: 0;
+        }
     </style>
 </head>
 <body class="container py-4">
     <div class="d-flex justify-content-end mb-2">
         <a href="/dashboard/" class="btn btn-primary">Go to Dashboard</a>
     </div>
-    <h2 class="mb-4">Home Automation Logs & Flowchart</h2>
+    <h2 class="mb-4">Home Automation Logs &amp; Flowchart</h2>
     
     <!-- Flowchart -->
     <div class="flowchart-container">
@@ -105,7 +118,9 @@
         {% for sensor in sensor_states %}
         <div class="flowchart-box sensor-{{ forloop.counter }} {% if sensor.on %}sensor-on{% else %}sensor-off{% endif %}" style="height: 110px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
             <div style="font-size: 1.1em; font-weight: 500; text-align: center; width: 100%;">{{ sensor.label }}</div>
-            <button class="btn btn-sm {% if sensor.on %}btn-success{% else %}btn-danger{% endif %} sensor-toggle mt-2 mb-1" data-sensor="{{ sensor.key }}" style="width: 80px;">{% if sensor.on %}ON{% else %}OFF{% endif %}</button>
+            <button class="btn btn-sm {% if sensor.on %}btn-success{% else %}btn-danger{% endif %} sensor-toggle mt-2 mb-1" data-sensor="{{ sensor.key }}" style="width: 80px;">
+                {% if sensor.on %}ON{% else %}OFF{% endif %}
+            </button>
             <div class="sensor-value" style="width: 100%; text-align: center;">{{ sensor.value|default:'--' }}</div>
         </div>
         <!-- Horizontal arrow from sensor to processor -->
@@ -180,29 +195,89 @@
         </div>
     </div>
     
+    <!-- Logs as tables -->
     <div class="row">
         <div class="col-md-4">
             <h5>Sensor Logs</h5>
-            <div id="sensor-logs" class="log-col">
-                {% for log in sensor_logs %}
-                <div><small>{{ log.timestamp_ist }}</small> <b>{{ log.event_type }}</b> ({{ log.sensor }}): {{ log.value }} <br><i>{{ log.details }}</i></div>
-                {% endfor %}
+            <div class="log-col p-0">
+                <table class="table table-sm table-bordered table-striped m-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Timestamp (IST)</th>
+                            <th>Event</th>
+                            <th>Sensor</th>
+                            <th>Value</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sensor-logs-body">
+                    {% for log in sensor_logs %}
+                        <tr>
+                            <td>{{ log.timestamp_ist }}</td>
+                            <td>{{ log.event_type }}</td>
+                            <td>{{ log.sensor }}</td>
+                            <td>{{ log.value }}</td>
+                            <td>{{ log.details }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="5" class="text-center">No Sensor Logs</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
         <div class="col-md-4">
             <h5>Cloud Logs</h5>
-            <div id="cloud-logs" class="log-col">
-                {% for log in cloud_logs %}
-                <div><small>{% with log.timestamp|date:'U' as uts %}{{ uts|add:19800|date:'Y-m-d H:i:s' }}{% endwith %}</small> <b>{{ log.event_type }}</b> ({{ log.sensor }}): {{ log.value }} <br><i>{{ log.details }}</i></div>
-                {% endfor %}
+            <div class="log-col p-0">
+                <table class="table table-sm table-bordered table-striped m-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Timestamp (IST)</th>
+                            <th>Event</th>
+                            <th>Sensor</th>
+                            <th>Value</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cloud-logs-body">
+                    {% for log in cloud_logs %}
+                        <tr>
+                            <td>{{ log.timestamp_ist }}</td>
+                            <td>{{ log.event_type }}</td>
+                            <td>{{ log.sensor }}</td>
+                            <td>{{ log.value }}</td>
+                            <td>{{ log.details }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="5" class="text-center">No Cloud Logs</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
         <div class="col-md-4">
             <h5>UI Logs</h5>
-            <div id="ui-logs" class="log-col">
-                {% for log in ui_logs %}
-                <div><small>{% with log.timestamp|date:'U' as uts %}{{ uts|add:19800|date:'Y-m-d H:i:s' }}{% endwith %}</small> <b>{{ log.event_type }}</b>: <i>{{ log.details }}</i></div>
-                {% endfor %}
+            <div class="log-col p-0">
+                <table class="table table-sm table-bordered table-striped m-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Timestamp (IST)</th>
+                            <th>Event</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ui-logs-body">
+                    {% for log in ui_logs %}
+                        <tr>
+                            <td>{{ log.timestamp_ist }}</td>
+                            <td>{{ log.event_type }}</td>
+                            <td>{{ log.details }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="3" class="text-center">No UI Logs</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -212,23 +287,56 @@
         $(document).on('click', '.sensor-toggle', function() {
             var btn = $(this);
             var sensor = btn.data('sensor');
-            $.post("/toggle_sensor/", {sensor: sensor}, function(data) {
+
+            // Disable button while processing
+            btn.prop('disabled', true);
+
+            $.post("/toggle_sensor/", {sensor: sensor})
+            .done(function(data) {
                 location.reload(); // Reload to update state and logs
+            })
+            .fail(function() {
+                alert('Failed to toggle sensor');
+            })
+            .always(function() {
+                btn.prop('disabled', false);
             });
         });
-        // Poll logs every 3 seconds
+
+        // Poll logs every 3 seconds and update the tables
         function pollLogs() {
             ["sensor", "cloud", "ui"].forEach(function(type) {
                 $.get(`/fetch_logs/${type}/`, function(resp) {
-                    var logs = resp.logs.map(function(l) {
+                    var tbodyId = `#${type}-logs-body`;
+                    var rows = "";
+                    resp.logs.forEach(function(l) {
+                        if(type === 'ui') {
+                            rows += `<tr>
+                                        <td>${l.timestamp}</td>
+                                        <td>${l.event_type}</td>
+                                        <td>${l.details}</td>
+                                     </tr>`;
+                        } else {
+                            rows += `<tr>
+                                        <td>${l.timestamp}</td>
+                                        <td>${l.event_type}</td>
+                                        <td>${l.sensor}</td>
+                                        <td>${l.value || ''}</td>
+                                        <td>${l.details || ''}</td>
+                                     </tr>`;
+                        }
+                    });
+                    if(!rows) {
                         if(type === 'ui')
-                            return `<div><small>${l.timestamp}</small> <b>${l.event_type}</b>: <i>${l.details}</i></div>`;
+                            rows = `<tr><td colspan="3" class="text-center">No ${type.charAt(0).toUpperCase() + type.slice(1)} Logs</td></tr>`;
                         else
-                            return `<div><small>${l.timestamp}</small> <b>${l.event_type}</b> (${l.sensor}): ${l.value || ''} <br><i>${l.details || ''}</i></div>`;
-                    }).join('');
-                    $(`#${type}-logs`).html(logs);
+                            rows = `<tr><td colspan="5" class="text-center">No ${type.charAt(0).toUpperCase() + type.slice(1)} Logs</td></tr>`;
+                    }
+                    $(tbodyId).html(rows);
                     // Auto-scroll to bottom (latest logs)
-                    $(`#${type}-logs`).scrollTop($(`#${type}-logs`)[0].scrollHeight);
+                    $(`#${type}-logs-body`).closest('.log-col').scrollTop(
+                        $(`#${type}-logs-body`).closest('.log-col')[0].scrollHeight
+                    );
                 });
             });
         }
